@@ -4,8 +4,7 @@
 openlayers3. Tested on version 3.16.0
 
 
-#Usage
+#View online
+https://ptsagkis.github.io/spatial-formats-parser/
 
- 
-#api Methods
 
