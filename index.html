@@ -54,7 +54,9 @@
 </div>
 </div>
 </div>
-<div class="container" id="featureContents">
+<div class="panel panel-default">
+    <div class="panel-body" id="featureContents">Feature contents here!</div>
+  </div>
 </div>
 </div>
 <script>
@@ -166,41 +168,115 @@ var formatParseApp = {
     var html = '';
     var counter = 0;
      features.forEach(function(f){
-      html += '<button type="button" class="btn btn-info btn-block" data-toggle="collapse" data-target="#featelem'+counter+'">Feature No:'+counter+'</button>';
+      html += '<button type="button" class="btn btn-warning btn-block" data-toggle="collapse" data-target="#featelem'+counter+'">Feature No:'+counter+'</button>';
       html += '<div id="featelem'+counter+'" class="collapse">';
        
       console.log("f",f.getProperties());
       var jsonObj = f.getProperties();      
         $.each(jsonObj, function(key, value){
         if (key=== 'geometry') {
-          
-          html += '<table>';
+          if (value !== null){ 
+          html += '<table class="table table-hover table-sm">';
           html += '<tr>';
-          html += '<td><button onclick="map.getView().fit(['+value.getExtent()+'], map.getSize()); " type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-map-marker"></span>Go To Map</button></td>'; 
+          html += '<td><button onclick="map.getView().fit(['+value.getExtent()+'], map.getSize()); " type="button" class="btn btn-info btn-block btn-sm"><span class="glyphicon glyphicon-map-marker"></span>Go To Map</button></td>'; 
           html += '</table>';
+          }  else {  
+           html += '<table class="table table-hover table-sm">';
+          html += '<tr>';
+          html += '<td><button type="button" class="btn btn-danger btn-block btn-sm"><span class="glyphicon glyphicon-map-marker"></span>Null Geometry</button></td>'; 
+          html += '</table>';    
+          }
          
-        } else {
-            html += '<table class="table table-hover">';
+        } else {  
+            html += '<table class="table table-hover table-sm">';
             html += '<tr>';
             html += '<td>' + key + '</td>';
             html += '<td>' + value + '</td>';
             html += '</tr>';
-            html += '</table>';
+            html += '</table>';   
         }
         }); 
         counter = counter + 1;  
         html += "</div>";
      });
-      //html += '</table>';
       $('#featureContents').html(html);
-    },
-    
-    zoomToExtent : function(geom){
-    console.log("geom",geom);
     }
     
 };
-    
+
+var geoJsonSample = {
+        "type": "FeatureCollection",
+        "crs": {
+          "type": "name",
+          "properties": {
+            "name": "EPSG:3857"
+          }
+        },
+        "features": [{
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [0, 0]
+          }
+        }, {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[4e6, -2e6], [8e6, 2e6]]
+          }
+        }, {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[4e6, 2e6], [8e6, -2e6]]
+          }
+        }, {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[-5e6, -1e6], [-4e6, 1e6], [-3e6, -1e6]]]
+          }
+        }, {
+          "type": "Feature",
+          "geometry": {
+            "type": "MultiLineString",
+            "coordinates": [
+              [[-1e6, -7.5e5], [-1e6, 7.5e5]],
+              [[1e6, -7.5e5], [1e6, 7.5e5]],
+              [[-7.5e5, -1e6], [7.5e5, -1e6]],
+              [[-7.5e5, 1e6], [7.5e5, 1e6]]
+            ]
+          }
+        }, {
+          "type": "Feature",
+          "geometry": {
+            "type": "MultiPolygon",
+            "coordinates": [
+              [[[-5e6, 6e6], [-5e6, 8e6], [-3e6, 8e6], [-3e6, 6e6]]],
+              [[[-2e6, 6e6], [-2e6, 8e6], [0, 8e6], [0, 6e6]]],
+              [[[1e6, 6e6], [1e6, 8e6], [3e6, 8e6], [3e6, 6e6]]]
+            ]
+          }
+        }, {
+          "type": "Feature",
+          "geometry": {
+            "type": "GeometryCollection",
+            "geometries": [{
+              "type": "LineString",
+              "coordinates": [[-5e6, -5e6], [0, -5e6]]
+            }, {
+              "type": "Point",
+              "coordinates": [4e6, -5e6]
+            }, {
+              "type": "Polygon",
+              "coordinates": [[[1e6, -6e6], [2e6, -4e6], [3e6, -6e6]]]
+            }]
+          }
+        }]
+      };
+
+
+   
 var image = new ol.style.Circle({
   radius: 5,
   fill: null,
