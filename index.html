@@ -16,7 +16,7 @@
 
 
 <div class="container" style="width: 100%;">
- <label>Select the data format you want to parse! </label>
+      <label>Select the data format you want to parse! </label>
       <div class="btn-group btn-input clearfix">
        <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
          <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
@@ -28,6 +28,16 @@
          <li onclick="formatParseApp.setFormat(event);"><a href="#">WKT</a></li>
        </ul>
      </div>
+     
+
+      <div class="checkbox">
+          <label>      
+            <input id="clearfeatschk" type="checkbox" /> <b>Clear existing features</b> 
+          </label>
+      </div>
+
+
+
 
     <div class="row">
         <div class="col-xs-6 center-block">
@@ -44,6 +54,8 @@
 </div>
 </div>
 </div>
+<div class="container" id="featureContents">
+</div>
 </div>
 <script>
 //namespace with properties and methods here
@@ -51,7 +63,6 @@ var formatParseApp = {
     selFormat : 'GeoJson',
     
     setFormat: function(event) {
-    console.log("event",event);
       var $target = $( event.currentTarget );
       document.getElementById('format-input').placeholder='Paste '+$target.text()+' here ';
       formatParseApp.selFormat = $target.text();
@@ -65,19 +76,21 @@ var formatParseApp = {
 
     clearAll: function() {
     document.getElementById('format-input').value='';
+    $('#featureContents').html('');
     vectorSource.clear();
     },
     
     parseIt: function() {
       var usrFormat = formatParseApp.selFormat;//  document.getElementById('formatSelector').value;
       var features;
-      vectorSource.clear();
+      if ($('#clearfeatschk').prop('checked')) vectorSource.clear();
       switch (usrFormat) {
        case 'GeoJson':
           try {
             features = new ol.format.GeoJSON().readFeatures(document.getElementById('format-input').value);
             vectorSource.addFeatures(features); 
-            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+            map.getView().fit(vectorSource.getExtent(), map.getSize()); 
+            formatParseApp.showFeatureData(features);       
           }
           catch(err) {  
             $('#message').html(
@@ -95,7 +108,8 @@ var formatParseApp = {
                        featureProjection:'EPSG:3857'
                     });
             vectorSource.addFeatures(features); 
-            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+            map.getView().fit(vectorSource.getExtent(), map.getSize()); 
+            formatParseApp.showFeatureData(features);          
           }
           catch(err) {  
             $('#message').html(
@@ -113,7 +127,8 @@ var formatParseApp = {
                        featureProjection:'EPSG:3857'
                     });
             vectorSource.addFeatures(features); 
-            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+            map.getView().fit(vectorSource.getExtent(), map.getSize()); 
+            formatParseApp.showFeatureData(features);          
           }
           catch(err) {  
             $('#message').html(
@@ -132,7 +147,8 @@ var formatParseApp = {
                        featureProjection:'EPSG:3857'
                     });
             vectorSource.addFeatures(features); 
-            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+            map.getView().fit(vectorSource.getExtent(), map.getSize());    
+            formatParseApp.showFeatureData(features);       
           }
           catch(err) {  
             $('#message').html(
@@ -144,7 +160,45 @@ var formatParseApp = {
            }
            break;
         }
+    },
+    
+    showFeatureData : function(features){
+    var html = '';
+    var counter = 0;
+     features.forEach(function(f){
+      html += '<button type="button" class="btn btn-info btn-block" data-toggle="collapse" data-target="#featelem'+counter+'">Feature No:'+counter+'</button>';
+      html += '<div id="featelem'+counter+'" class="collapse">';
+       
+      console.log("f",f.getProperties());
+      var jsonObj = f.getProperties();      
+        $.each(jsonObj, function(key, value){
+        if (key=== 'geometry') {
+          
+          html += '<table>';
+          html += '<tr>';
+          html += '<td><button onclick="map.getView().fit(['+value.getExtent()+'], map.getSize()); " type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-map-marker"></span>Go To Map</button></td>'; 
+          html += '</table>';
+         
+        } else {
+            html += '<table class="table table-hover">';
+            html += '<tr>';
+            html += '<td>' + key + '</td>';
+            html += '<td>' + value + '</td>';
+            html += '</tr>';
+            html += '</table>';
+        }
+        }); 
+        counter = counter + 1;  
+        html += "</div>";
+     });
+      //html += '</table>';
+      $('#featureContents').html(html);
+    },
+    
+    zoomToExtent : function(geom){
+    console.log("geom",geom);
     }
+    
 };
     
 var image = new ol.style.Circle({
