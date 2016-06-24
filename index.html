@@ -220,15 +220,13 @@ var formatParseApp = {
     console.log(url);
     $.ajax({
     url: url,
-    dataType: 'json',
     type: 'GET',
     success: function (data) {
         console.log(data);
+        document.getElementById('format-input').value = data;
     }
   });
-    $.get(url, function(data) {
-     console.log("sample data",data);
-    });
+   
     }
     
 };
