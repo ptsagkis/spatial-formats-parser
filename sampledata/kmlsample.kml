@@ -879,7 +879,7 @@ Simple Tables:<br>
           </Polygon>
         </Placemark>
         <Placemark>
-          <name>Relative Extruded</name>
+          <name>Relative Extruded </name>
           <visibility>0</visibility>
           <LookAt>
             <longitude>-112.3351587892382</longitude>
