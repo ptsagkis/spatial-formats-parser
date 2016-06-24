@@ -2,11 +2,14 @@
   <head>
     <title>Test GeoJSON</title>
   
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"></link>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.16.0/ol.css" rel="stylesheet" type="text/css"></link>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.16.0/ol.css" rel="stylesheet" type="text/css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.16.0/ol-debug.js"></script>
+<style>
+
+</style>
 </head>
 
   <body>    
@@ -17,6 +20,7 @@
  <label>Select the data format you want to parse! </label>
 =======
  <label >Select the data format you want to parse! </label>
+<<<<<<< HEAD
 >>>>>>> refs/remotes/origin/master
   <select class="form-control" id="formatSelector" onchange="setFormat(this);">
     <option value="GeoJson">GeoJson</option>
@@ -24,13 +28,28 @@
     <option value="KML">KML</option>
     <option value="GPX">GPX</option>
 </select>
+=======
+ 
+      <div class="btn-group btn-input clearfix">
+       <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
+         <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
+       </button>
+       <ul class="dropdown-menu" role="menu">
+         <li onclick="formatParseApp.setFormat(event);"><a href="#">GeoJson</a></li>
+         <li onclick="formatParseApp.setFormat(event);"><a href="#">GPX</a></li>
+         <li onclick="formatParseApp.setFormat(event);"><a href="#">KML</a></li>
+         <li onclick="formatParseApp.setFormat(event);"><a href="#">WKT</a></li>
+       </ul>
+     </div>
+     
+>>>>>>> refs/remotes/origin/master
     <div class="row">
         <div class="col-xs-6 center-block">
           <div style="position:absolute;bottom: 0;padding-bottom:50px" id="message"></div>
           <textarea class="form-control" id="format-input" placeholder="Paste GeoJSON here" style="height: 500px;"></textarea>
           <div style="text-align:center;">
-                     <a id="submit" class="btn btn-primary btn-large btn-action" onclick="parseIt()" >Parse It!!!</a>
-                    <a id="clear" class="btn btn-large btn-action btn-default" onclick="clearAll()" >Clear</a>
+                    <a id="submit" class="btn btn-primary btn-large btn-action" onclick="formatParseApp.parseIt()" >Parse It!!!</a>
+                    <a id="clear" class="btn btn-large btn-action btn-default" onclick="formatParseApp.clearAll()" >Clear</a>
           </div>
 
         </div>
@@ -40,7 +59,108 @@
 </div>
 </div>
 </div>
-<script>    
+<script>
+//namespace with properties and methods here
+var formatParseApp = {
+    selFormat : 'GeoJson',
+    
+    setFormat: function(event) {
+    console.log("event",event);
+      var $target = $( event.currentTarget );
+      document.getElementById('format-input').placeholder='Paste '+$target.text()+' here ';
+      formatParseApp.selFormat = $target.text();
+      $target.closest( '.btn-group' )
+         .find( '[data-bind="label"]' ).text( $target.text() )
+            .end()
+         .children( '.dropdown-toggle' ).dropdown( 'toggle' );
+      
+      return false;
+    },
+
+    clearAll: function() {
+    document.getElementById('format-input').value='';
+    vectorSource.clear();
+    },
+    
+    parseIt: function() {
+      var usrFormat = formatParseApp.selFormat;//  document.getElementById('formatSelector').value;
+      var features;
+      vectorSource.clear();
+      switch (usrFormat) {
+       case 'GeoJson':
+          try {
+            features = new ol.format.GeoJSON().readFeatures(document.getElementById('format-input').value);
+            vectorSource.addFeatures(features); 
+            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+          }
+          catch(err) {  
+            $('#message').html(
+                 '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
+                 '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing GeoJson:'+err.message+'</div>');  
+                  $("#message").fadeTo(4000, 500).slideUp(500, function(){
+                  $("#message").alert('close');
+              });
+           }
+           break;
+       case 'KML':   
+          try {
+            features = new ol.format.KML().readFeatures(document.getElementById('format-input').value,{
+                       dataProjection:'EPSG:4326',
+                       featureProjection:'EPSG:3857'
+                    });
+            vectorSource.addFeatures(features); 
+            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+          }
+          catch(err) {  
+            $('#message').html(
+                 '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
+                 '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing KML:'+err.message+'</div>');  
+                  $("#message").fadeTo(4000, 500).slideUp(500, function(){
+                  $("#message").alert('close');
+              });
+           }
+           break;    
+       case 'GPX':   
+          try {
+            features = new ol.format.GPX().readFeatures(document.getElementById('format-input').value,{
+                       dataProjection:'EPSG:4326',
+                       featureProjection:'EPSG:3857'
+                    });
+            vectorSource.addFeatures(features); 
+            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+          }
+          catch(err) {  
+            $('#message').html(
+                 '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
+                 '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing GPX:'+err.message+'</div>');  
+                  $("#message").fadeTo(4000, 500).slideUp(500, function(){
+                  $("#message").alert('close');
+              });
+           }
+           break;
+           //wkt sample "POLYGON((-15.8203125 2.4609375, -15.8203125 -10.546875, 6.85546875 -11.25, 8.26171875 -3.33984375, -15.8203125 2.4609375))"
+        case 'WKT':   
+          try {
+            features = new ol.format.WKT().readFeatures(document.getElementById('format-input').value,{
+                       dataProjection:'EPSG:4326',
+                       featureProjection:'EPSG:3857'
+                    });
+            vectorSource.addFeatures(features); 
+            map.getView().fit(vectorSource.getExtent(), map.getSize());         
+          }
+          catch(err) {  
+            $('#message').html(
+                 '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
+                 '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing WKT:'+err.message+'</div>');  
+                  $("#message").fadeTo(4000, 500).slideUp(500, function(){
+                  $("#message").alert('close');
+              });
+           }
+           break;
+        }
+    }
+};
+    
 var image = new ol.style.Circle({
   radius: 5,
   fill: null,
@@ -141,94 +261,11 @@ var map = new ol.Map({
   })
 });
 
-function parseIt(){ 
-var usrFormat =   document.getElementById('formatSelector').value;
-var features;
-vectorSource.clear();
-switch (usrFormat) {
- case 'GeoJson':
-    try {
-      features = new ol.format.GeoJSON().readFeatures(document.getElementById('format-input').value);
-      vectorSource.addFeatures(features); 
-      map.getView().fit(vectorSource.getExtent(), map.getSize());         
-    }
-    catch(err) {  
-      $('#message').html(
-           '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
-           '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing GeoJson:'+err.message+'</div>');  
-            $("#message").fadeTo(4000, 500).slideUp(500, function(){
-            $("#message").alert('close');
-        });
-     }
-     break;
-case 'KML':   
-    try {
-      features = new ol.format.KML().readFeatures(document.getElementById('format-input').value,{
-                 dataProjection:'EPSG:4326',
-                 featureProjection:'EPSG:3857'
-              });
-      vectorSource.addFeatures(features); 
-      map.getView().fit(vectorSource.getExtent(), map.getSize());         
-    }
-    catch(err) {  
-      $('#message').html(
-           '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
-           '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing KML:'+err.message+'</div>');  
-            $("#message").fadeTo(4000, 500).slideUp(500, function(){
-            $("#message").alert('close');
-        });
-     }
-     break;    
- case 'GPX':   
-    try {
-      features = new ol.format.GPX().readFeatures(document.getElementById('format-input').value,{
-                 dataProjection:'EPSG:4326',
-                 featureProjection:'EPSG:3857'
-              });
-      vectorSource.addFeatures(features); 
-      map.getView().fit(vectorSource.getExtent(), map.getSize());         
-    }
-    catch(err) {  
-      $('#message').html(
-           '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
-           '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing GPX:'+err.message+'</div>');  
-            $("#message").fadeTo(4000, 500).slideUp(500, function(){
-            $("#message").alert('close');
-        });
-     }
-     break;
-     //wkt sample "POLYGON((-15.8203125 2.4609375, -15.8203125 -10.546875, 6.85546875 -11.25, 8.26171875 -3.33984375, -15.8203125 2.4609375))"
-  case 'WKT':   
-    try {
-      features = new ol.format.WKT().readFeatures(document.getElementById('format-input').value,{
-                 dataProjection:'EPSG:4326',
-                 featureProjection:'EPSG:3857'
-              });
-      vectorSource.addFeatures(features); 
-      map.getView().fit(vectorSource.getExtent(), map.getSize());         
-    }
-    catch(err) {  
-      $('#message').html(
-           '<div style="margin: 20px;"  class="alert alert-danger fade in">'+
-           '<a href="#" class="close" data-dismiss="alert">&times;</a>Error Parsing WKT:'+err.message+'</div>');  
-            $("#message").fadeTo(4000, 500).slideUp(500, function(){
-            $("#message").alert('close');
-        });
-     }
-     break;
-  }
-
-}
 
 
-function setFormat(elm){
-document.getElementById('format-input').placeholder='Paste '+elm.value+' here ';
-}
 
-function clearAll(){
-document.getElementById('format-input').value='';
-vectorSource.clear();
-}
+
+
     </script>
   </body>
 </html>
