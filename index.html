@@ -16,16 +16,29 @@
 
 
 <div class="container" style="width: 100%;">
-      <label>Select the data format you want to parse! </label>
+      <label>Select the data format you want to parse: </label>
       <div class="btn-group btn-input clearfix">
        <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
          <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
        </button>
-       <ul class="dropdown-menu" role="menu">
+       <ul id="formatSelector" class="dropdown-menu" role="menu">
          <li onclick="formatParseApp.setFormat(event);"><a href="#">GeoJson</a></li>
          <li onclick="formatParseApp.setFormat(event);"><a href="#">GPX</a></li>
          <li onclick="formatParseApp.setFormat(event);"><a href="#">KML</a></li>
          <li onclick="formatParseApp.setFormat(event);"><a href="#">WKT</a></li>
+       </ul>
+     </div>
+     
+       <label>For DEMO purposes you may load sample data from here: </label>
+      <div class="btn-group btn-input clearfix">
+       <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
+         <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
+       </button>
+       <ul id="demoSlector" class="dropdown-menu" role="menu">
+         <li onclick="formatParseApp.loadSample('/sampledata/geojson_sample.json',event);"><a href="#">GeoJson</a></li>
+         <li onclick="formatParseApp.loadSample('/sampledata/kml_sample.json',event);"><a href="#">KML</a></li>
+         <li onclick="formatParseApp.loadSample('');"><a href="#">GPX</a></li>
+         <li onclick="formatParseApp.loadSample('');"><a href="#">WKT</a></li>
        </ul>
      </div>
      
@@ -200,83 +213,27 @@ var formatParseApp = {
         html += "</div>";
      });
       $('#featureContents').html(html);
+    },
+    
+    loadSample : function(url,event){
+    formatParseApp.setFormat(event);
+    console.log(url);
+    $.ajax({
+    url: url,
+    dataType: 'json',
+    type: 'GET',
+    success: function (data) {
+        console.log(data);
+    }
+  });
+    $.get(url, function(data) {
+     console.log("sample data",data);
+    });
     }
     
 };
 
-var geoJsonSample = {
-        "type": "FeatureCollection",
-        "crs": {
-          "type": "name",
-          "properties": {
-            "name": "EPSG:3857"
-          }
-        },
-        "features": [{
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [0, 0]
-          }
-        }, {
-          "type": "Feature",
-          "geometry": {
-            "type": "LineString",
-            "coordinates": [[4e6, -2e6], [8e6, 2e6]]
-          }
-        }, {
-          "type": "Feature",
-          "geometry": {
-            "type": "LineString",
-            "coordinates": [[4e6, 2e6], [8e6, -2e6]]
-          }
-        }, {
-          "type": "Feature",
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [[[-5e6, -1e6], [-4e6, 1e6], [-3e6, -1e6]]]
-          }
-        }, {
-          "type": "Feature",
-          "geometry": {
-            "type": "MultiLineString",
-            "coordinates": [
-              [[-1e6, -7.5e5], [-1e6, 7.5e5]],
-              [[1e6, -7.5e5], [1e6, 7.5e5]],
-              [[-7.5e5, -1e6], [7.5e5, -1e6]],
-              [[-7.5e5, 1e6], [7.5e5, 1e6]]
-            ]
-          }
-        }, {
-          "type": "Feature",
-          "geometry": {
-            "type": "MultiPolygon",
-            "coordinates": [
-              [[[-5e6, 6e6], [-5e6, 8e6], [-3e6, 8e6], [-3e6, 6e6]]],
-              [[[-2e6, 6e6], [-2e6, 8e6], [0, 8e6], [0, 6e6]]],
-              [[[1e6, 6e6], [1e6, 8e6], [3e6, 8e6], [3e6, 6e6]]]
-            ]
-          }
-        }, {
-          "type": "Feature",
-          "geometry": {
-            "type": "GeometryCollection",
-            "geometries": [{
-              "type": "LineString",
-              "coordinates": [[-5e6, -5e6], [0, -5e6]]
-            }, {
-              "type": "Point",
-              "coordinates": [4e6, -5e6]
-            }, {
-              "type": "Polygon",
-              "coordinates": [[[1e6, -6e6], [2e6, -4e6], [3e6, -6e6]]]
-            }]
-          }
-        }]
-      };
 
-
-   
 var image = new ol.style.Circle({
   radius: 5,
   fill: null,
