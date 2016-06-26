@@ -217,6 +217,7 @@ var formatParseApp = {
     },
     zoomToFeature: function (extent){
     console.log(extent);
+    $("html, body").animate({ scrollTop: 0 }, "slow");
     map.getView().fit(extent, map.getSize());  
     },
     loadSample : function(url,event){
