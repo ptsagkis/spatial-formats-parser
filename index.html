@@ -20,11 +20,11 @@
  
   <div class="row center-block">
       <label>For DEMO purposes you may load sample data from here: </label>
-      <div class="btn-group btn-input clearfix">
+      <div id="demoSelectorBtn" class="btn-group btn-input clearfix">
        <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
          <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
        </button>
-       <ul id="demoSlector" class="dropdown-menu" role="menu">
+       <ul id="demoSelector" class="dropdown-menu" role="menu">
          <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/geojson_sample.json',event);"><a href="#">GeoJson</a></li>
          <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/kml_sample.kml',event);"><a href="#">KML</a></li>
          <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/wkt.txt',event);"><a href="#">WKT</a></li>
@@ -34,18 +34,12 @@
      </div>
      </div>
      
-      <div class="row center-block">
-      <div class="checkbox">
-          <label>      
-            <input id="clearfeatschk" type="checkbox" /> <b>Clear existing features</b> 
-          </label>
-      </div>
-      </div>
+    
      
      
       <div class="row center-block">
       <label>Select the data format you want to parse: </label>
-      <div class="btn-group btn-input clearfix">
+      <div id="formatSelectorBtn"  class="btn-group btn-input clearfix">
        <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
          <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
        </button>
@@ -68,6 +62,11 @@
           <div style="position:absolute;bottom: 0;padding-bottom:50px" id="message"></div>
           <textarea class="form-control" id="format-input" placeholder="Paste GeoJSON here" style="height: 500px;"></textarea>
           <div style="text-align:center;">
+                  <div class="checkbox">
+                      <label>      
+                        <input id="clearfeatschk" type="checkbox" /> <b>Clear existing features</b> 
+                      </label>
+                  </div>
                     <a id="submit" class="btn btn-primary btn-large btn-action" onclick="formatParseApp.parseIt()" >Parse It!!!</a>
                     <a id="clear" class="btn btn-large btn-action btn-default" onclick="formatParseApp.clearAll()" >Clear</a>
           </div>
@@ -90,24 +89,31 @@ var formatParseApp = {
     
     setFormat: function(event) {
       var $target = $( event.currentTarget );
+      
       document.getElementById('format-input').placeholder='Paste '+$target.text()+' here ';
       formatParseApp.selFormat = $target.text();
+      
       $target.closest( '.btn-group' )
          .find( '[data-bind="label"]' ).text( $target.text() )
             .end()
          .children( '.dropdown-toggle' ).dropdown( 'toggle' );
       
+        if ($target.closest( '.btn-group' )[0].id !== 'formatSelectorBtn'){ //case when demo selected  
+          $('#formatSelectorBtn').find( '[data-bind="label"]' ).text( $target.text() )
+                .end()
+             .children( '.dropdown-toggle' ).dropdown( 'toggle' );
+         }
       return false;
     },
 
     clearAll: function() {
     document.getElementById('format-input').value='';
-    $('#featureContents').html('');
+    $('#featureContents').html('Feature contents here!');
     vectorSource.clear();
     },
     
     parseIt: function() {
-      var usrFormat = formatParseApp.selFormat;//  document.getElementById('formatSelector').value;
+      var usrFormat = formatParseApp.selFormat;
       var features;
       if ($('#clearfeatschk').prop('checked')) vectorSource.clear();
       switch (usrFormat) {
@@ -228,12 +234,11 @@ var formatParseApp = {
     zoomToFeature: function (extent){
     console.log(extent);
     $("html, body").animate({ scrollTop: $('#map').offset().top }, "slow");
-    //$("html, body").scrollTop($(element).offset().top);
     map.getView().fit(extent, map.getSize());  
     },
+    
     loadSample : function(url,event){
     formatParseApp.setFormat(event);
-    console.log(url);
     $.ajax({
     url: url,
     type: 'GET',
