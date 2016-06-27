@@ -26,7 +26,8 @@
          <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
        </button>
        <ul id="demoSelector" class="dropdown-menu" role="menu">
-         <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/geojson_sample.json',event);"><a href="#">GeoJson</a></li>
+         <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/geojson_sample.json',event);"><a href="#">GeoJson1</a></li>
+         <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/countries.json',event);"><a href="#">GeoJson2</a></li>
          <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/kml_sample.kml',event);"><a href="#">KML</a></li>
          <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/gpx.gpx',event);"><a href="#">GPX</a></li>
          <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/wkt.txt',event);"><a href="#">WKT</a></li>
@@ -89,17 +90,18 @@ var formatParseApp = {
     
     setFormat: function(event) {
       var $target = $( event.currentTarget );
-      
-      document.getElementById('format-input').placeholder='Paste '+$target.text()+' here ';
-      formatParseApp.selFormat = $target.text();
+      var format = $target.text();
+      if (format === 'GeoJson1' || format === 'GeoJson2') format = 'GeoJson'
+      document.getElementById('format-input').placeholder='Paste '+format+' here ';
+      formatParseApp.selFormat = format;
       
       $target.closest( '.btn-group' )
          .find( '[data-bind="label"]' ).text( $target.text() )
             .end()
          .children( '.dropdown-toggle' ).dropdown( 'toggle' );
       
-        if ($target.closest( '.btn-group' )[0].id !== 'formatSelectorBtn'){ //case when demo selected  
-          $('#formatSelectorBtn').find( '[data-bind="label"]' ).text( $target.text() )
+        if ($target.closest( '.btn-group' )[0].id !== 'formatSelectorBtn'){ //case when demo selected need to update the format selector 
+          $('#formatSelectorBtn').find( '[data-bind="label"]' ).text( format )
                 .end()
              .children( '.dropdown-toggle' ).dropdown( 'toggle' );
          }
@@ -231,6 +233,7 @@ var formatParseApp = {
      });
       $('#featureContents').html(html);
     },
+    
     zoomToFeature: function (extent){
     console.log(extent);
     $("html, body").animate({ scrollTop: $('#map').offset().top }, "slow");
