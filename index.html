@@ -192,7 +192,7 @@ var formatParseApp = {
           if (value !== null){ 
           html += '<table class="table table-hover table-sm">';
           html += '<tr>';
-          html += '<td><button onclick="map.getView().fit(['+value.getExtent()+'], map.getSize()); " type="button" class="btn btn-info btn-block btn-sm"><span class="glyphicon glyphicon-map-marker"></span>Go To Map</button></td>'; 
+          html += '<td><button onclick="formatParseApp.zoomToFeature(['+value.getExtent()+']); " type="button" class="btn btn-info btn-block btn-sm"><span class="glyphicon glyphicon-map-marker"></span>Go To Map</button></td>'; 
           html += '</table>';
           }  else {  
            html += '<table class="table table-hover table-sm">';
@@ -215,7 +215,12 @@ var formatParseApp = {
      });
       $('#featureContents').html(html);
     },
-    
+    zoomToFeature: function (extent){
+    console.log(extent);
+    $("html, body").animate({ scrollTop: $('#map').offset().top }, "slow");
+    //$("html, body").scrollTop($(element).offset().top);
+    map.getView().fit(extent, map.getSize());  
+    },
     loadSample : function(url,event){
     formatParseApp.setFormat(event);
     console.log(url);
