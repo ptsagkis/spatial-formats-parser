@@ -11,8 +11,7 @@
 
 </style>
 </head>
-
-  <body>    
+<body>    
 
 
 <div class="container" style="width: 100%;">
@@ -121,7 +120,18 @@ var formatParseApp = {
       switch (usrFormat) {
        case 'GeoJson':
           try {
-            features = new ol.format.GeoJSON().readFeatures(document.getElementById('format-input').value);
+            var defProj = 'EPSG:4326';
+            
+            var geoJsonProj =  new ol.format.GeoJSON().readProjection(document.getElementById('format-input').value);
+            if (typeof geoJsonProj !== 'undefined' && geoJsonProj !== null){
+            defProj = geoJsonProj;
+            }
+            features = new ol.format.GeoJSON().readFeatures(
+            document.getElementById('format-input').value,
+            {
+            dataProjection:defProj,
+            featureProjection:'EPSG:3857'
+            });
             vectorSource.addFeatures(features); 
             map.getView().fit(vectorSource.getExtent(), map.getSize()); 
             formatParseApp.showFeatureData(features);       
