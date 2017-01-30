@@ -1,23 +1,38 @@
-﻿<html>
+<html>
   <head>
     <title>Online Spatial Formats Parser and Viewer (geojson,kml,gpx,wkt)</title>
   
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.16.0/ol.css" rel="stylesheet" type="text/css"/>
+<link href="https://openlayers.org/en/latest/css/ol.css" rel="stylesheet" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.16.0/ol-debug.js"></script>
+<script src="https://openlayers.org/en/latest/build/ol-debug.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.15/proj4.js"></script>
 <style>
-
+ 
 </style>
 </head>
 <body>    
 
 
-<div class="container" style="width: 100%;">
- <h1>Online Spatial Formats Parser and Viewer (geojson,kml,gpx,wkt) </h1>
- <h3>using openlayers3 libs (ol.format). Data shall be supplied in WGS84 (epsg:4326) </h3>
- 
+  <div class="container" style="width: 100%;">
+     <h1>Online Spatial Formats Parser and Viewer (geojson,kml,gpx,wkt) </h1>
+     <h3>using openlayers3 libs (ol.format).</h3>
+     <h4> Data shall be supplied in WGS84 (epsg:4326) otherwise go for searching your epsg</h4>
+     <h5>If your data is projected in an EPSG other than 4326, use the textbox below to search and select the desired EPSG</h5>
+     <h5>Parser should do the reprojection for you. (all data will be reprojected to EPSG:3857, which is the map projection)  <h5>
+     
+    <div class="input-group col-md-4">
+      <span class="input-group-addon" id="search-label">EPSG</span>
+      <input id="epsg-query" type="text" class="form-control" placeholder="type the EPSG code" aria-describedby="search-label">
+      <span class="input-group-btn">
+            <button onclick="formatParseApp.searchEPSG()" class="btn btn-primary" type="button">search</button>
+      </span>
+      <div class="input-group-addon" id="epsginfo">(4326) WGS 84</div>
+    </div>
+  </div>  
+    
+                 
   <div class="row center-block">
       <label>For DEMO purposes you may load sample data from here: </label>
       <div id="demoSelectorBtn" class="btn-group btn-input clearfix">
@@ -86,6 +101,7 @@
 //namespace with properties and methods here
 var formatParseApp = {
     selFormat : 'GeoJson',
+    defProj   : 'EPSG:4326',
     
     setFormat: function(event) {
       var $target = $( event.currentTarget );
@@ -116,22 +132,33 @@ var formatParseApp = {
     parseIt: function() {
       var usrFormat = formatParseApp.selFormat;
       var features;
+      console.log("formatParseApp.defProj1",formatParseApp.defProj)
       if ($('#clearfeatschk').prop('checked')) vectorSource.clear();
       switch (usrFormat) {
        case 'GeoJson':
           try {
-            var defProj = 'EPSG:4326';
+            
             
             var geoJsonProj =  new ol.format.GeoJSON().readProjection(document.getElementById('format-input').value);
-            if (typeof geoJsonProj !== 'undefined' && geoJsonProj !== null){
-            defProj = geoJsonProj;
+            console.log("geoJsonProj",geoJsonProj);
+            if (typeof geoJsonProj !== 'undefined' && geoJsonProj !== null && geoJsonProj.code_ !== "EPSG:4326"){
+            formatParseApp.defProj = geoJsonProj;
+            }
+            console.log("formatParseApp.defProj2",formatParseApp.defProj)
+            var projConfig = {};
+            if (formatParseApp.defProj == 'EPSG:3857') {
+            console.log("proj config equals map projection")
+            projConfig = {};
+            } else if (formatParseApp.defProj != 'EPSG:3857') {
+            projConfig = {
+            dataProjection: ol.proj.get(formatParseApp.defProj),
+            featureProjection: ol.proj.get('EPSG:3857')
+            }
             }
             features = new ol.format.GeoJSON().readFeatures(
             document.getElementById('format-input').value,
-            {
-            dataProjection:defProj,
-            featureProjection:'EPSG:3857'
-            });
+            projConfig
+            );
             vectorSource.addFeatures(features); 
             map.getView().fit(vectorSource.getExtent(), map.getSize()); 
             formatParseApp.showFeatureData(features);       
@@ -148,7 +175,7 @@ var formatParseApp = {
        case 'KML':   
           try {
             features = new ol.format.KML().readFeatures(document.getElementById('format-input').value,{
-                       dataProjection:'EPSG:4326',
+                       dataProjection: ol.proj.get(formatParseApp.defProj),
                        featureProjection:'EPSG:3857'
                     });
             vectorSource.addFeatures(features); 
@@ -167,7 +194,7 @@ var formatParseApp = {
        case 'GPX':   
           try {
             features = new ol.format.GPX().readFeatures(document.getElementById('format-input').value,{
-                       dataProjection:'EPSG:4326',
+                       dataProjection: ol.proj.get(formatParseApp.defProj),
                        featureProjection:'EPSG:3857'
                     });
             vectorSource.addFeatures(features); 
@@ -187,7 +214,7 @@ var formatParseApp = {
         case 'WKT':   
           try {
             features = new ol.format.WKT().readFeatures(document.getElementById('format-input').value,{
-                       dataProjection:'EPSG:4326',
+                       dataProjection: ol.proj.get(formatParseApp.defProj),
                        featureProjection:'EPSG:3857'
                     });
             vectorSource.addFeatures(features); 
@@ -259,8 +286,65 @@ var formatParseApp = {
         console.log(data);
         document.getElementById('format-input').value = data;
     }
-  });
+    });
    
+    },
+    
+    searchEPSG : function(){
+    var valToSearch = $("#epsg-query").val().trim();
+    if (valToSearch=="") {
+    $("#epsginfo").html('(4326) WGS 84');
+    formatParseApp.defProj = 'EPSG:4326';
+    return;
+    }
+    $("#epsginfo").html('Searching for:' +valToSearch+' .....');
+    $.ajax({
+    url: 'https://epsg.io/?format=json&q='+valToSearch,
+    type: 'GET',
+    success: function (data) {
+      var results = data.results;
+      if (results && results.length > 0) {
+       for (var i = 0, ii = results.length; i < ii; i++) {
+        var result = results[i];
+        
+        if (result) {
+        var code = result['code'].trim();
+        var name = result['name'];
+        var proj4def = result['proj4'];
+        var bbox = result['bbox'];
+        console.log("bbox",bbox);
+        if (code === null || name === null || proj4def === null || bbox === null) {
+           $("#epsginfo").html('Nothing usable found, using EPSG:4326...');
+          
+          return;
+        }
+        
+        //succeed finding the supplied projection
+        
+         $("#epsginfo").html( '(' + code + ') ' + name );
+
+        formatParseApp.defProj = 'EPSG:' + code;
+        proj4.defs(formatParseApp.defProj, proj4def);
+        var newProj = ol.proj.get(formatParseApp.defProj);
+        var fromLonLat = ol.proj.getTransform('EPSG:4326', 'EPSG:3857');
+      
+        // very approximate calculation of projection extent
+        var extent = ol.extent.applyTransform(
+            [bbox[1], bbox[2], bbox[3], bbox[0]], fromLonLat);
+        newProj.setExtent(extent);
+        console.log("extent",extent)
+         map.getView().fit(extent,  map.getSize());
+        }
+        }
+        
+        
+      }  else {
+            $("#epsginfo").html('Nothing usable found, using EPSG:4326...');
+            formatParseApp.defProj = 'EPSG:4326'
+      }
+    }
+    });
+ 
     }
     
 };
