@@ -14,16 +14,18 @@
 </head>
 <body>    
 
-
-  <div class="container" style="width: 100%;">
-     <h1>Online Spatial Formats Parser and Viewer (geojson,kml,gpx,wkt) </h1>
-     <h3>using openlayers3 libs (ol.format).</h3>
+  <div class="titlecontainer" style="width: 100%;">
+  <h1>Online Spatial Formats Parser and Viewer (geojson,kml,gpx,wkt) </h1>
+   <h3>using openlayers3 libs (ol.format).</h3>
+  </div>
+  <div class="row" style="width: 100%;">
+   <div class="col-xs-6 center-block">    
      <h4> Data shall be supplied in WGS84 (epsg:4326) otherwise go for searching your epsg</h4>
      <h5>If your data is projected in an EPSG other than 4326, use the textbox below to search and select the desired EPSG</h5>
      <h5>In the case of geojson. If EPSG is clarified within geojson , this should overwrite the one typed and found(if any)</h5>
      <h5>Parser should do the reprojection for you. (all data will be reprojected to EPSG:3857, which is the map projection)  <h5>
      
-    <div class="input-group col-md-4">
+    <div class="input-group col-md-6">
       <span class="input-group-addon" id="search-label">EPSG</span>
       <input id="epsg-query" type="text" class="form-control" placeholder="type the EPSG code" aria-describedby="search-label">
       <span class="input-group-btn">
@@ -32,9 +34,10 @@
       <div class="input-group-addon" id="epsginfo">(4326) WGS 84</div>
     </div>
   </div>  
-    
+  
                  
-  <div class="row center-block">
+  <div class="col-xs-6 center-block">
+  <h5>
       <label>For DEMO purposes you may load sample data from here: </label>
       <div id="demoSelectorBtn" class="btn-group btn-input clearfix">
        <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
@@ -48,13 +51,14 @@
          <li onclick="formatParseApp.loadSample('https://raw.githubusercontent.com/ptsagkis/spatial-formats-parser/gh-pages/sampledata/wkt.txt',event);"><a href="#">WKT</a></li>
        </ul>
      </div>
-     </div>
+     </h5>
+     
      
     
      
      
-      <div class="row center-block">
-      <label>Select the data format you want to parse: </label>
+      <h5>
+      <label>Select the format type of data you want to parse: </label>
       <div id="formatSelectorBtn"  class="btn-group btn-input clearfix">
        <button type="button" class="btn btn-default btn-large btn-action dropdown-toggle form-control" data-toggle="dropdown">
          <span data-bind="label">GeoJson</span>&nbsp;<span class="caret"></span>
@@ -66,8 +70,10 @@
          <li onclick="formatParseApp.setFormat(event);"><a href="#">WKT</a></li>
        </ul>
      </div>
+     </h5>
      </div>
-     
+     </div>
+     </div>
     
      
 
