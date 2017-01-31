@@ -20,6 +20,7 @@
      <h3>using openlayers3 libs (ol.format).</h3>
      <h4> Data shall be supplied in WGS84 (epsg:4326) otherwise go for searching your epsg</h4>
      <h5>If your data is projected in an EPSG other than 4326, use the textbox below to search and select the desired EPSG</h5>
+     <h5>In the case of geojson. If EPSG is clarified within geojson , this should overwrite the one typed and found(if any)</h5>
      <h5>Parser should do the reprojection for you. (all data will be reprojected to EPSG:3857, which is the map projection)  <h5>
      
     <div class="input-group col-md-4">
@@ -125,6 +126,9 @@ var formatParseApp = {
 
     clearAll: function() {
     document.getElementById('format-input').value='';
+    document.getElementById('epsginfo').innerHTML = "(4326) WGS 84";
+    $('#epsg-query').val("");
+    this.defProj = 'EPSG:4326';
     $('#featureContents').html('Feature contents here!');
     vectorSource.clear();
     },
@@ -141,8 +145,11 @@ var formatParseApp = {
             
             var geoJsonProj =  new ol.format.GeoJSON().readProjection(document.getElementById('format-input').value);
             console.log("geoJsonProj",geoJsonProj);
-            if (typeof geoJsonProj !== 'undefined' && geoJsonProj !== null && geoJsonProj.code_ !== "EPSG:4326"){
+            if (typeof geoJsonProj !== 'undefined' && geoJsonProj !== null){
             formatParseApp.defProj = geoJsonProj;
+            // document.getElementById('epsginfo').innerHTML = geoJsonProj.code_;
+            $('#epsg-query').val(geoJsonProj.code_.split(":")[1]);
+            this.searchEPSG();
             }
             console.log("formatParseApp.defProj2",formatParseApp.defProj)
             var projConfig = {};
