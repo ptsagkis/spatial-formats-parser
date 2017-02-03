@@ -25,14 +25,7 @@
      <h5>In the case of geojson. If EPSG is clarified within geojson , this should overwrite the one typed and found(if any)</h5>
      <h5>Parser should do the reprojection for you. (all data will be reprojected to EPSG:3857, which is the default map projection)  <h5>
      
-    <div class="input-group" style="width: 100%;">
-      <span class="input-group-addon" id="search-label">EPSG</span>
-      <input id="epsg-query" type="text" class="form-control" placeholder="type the EPSG code" aria-describedby="search-label">
-      <span class="input-group-btn">
-            <button onclick="formatParseApp.searchEPSG()" class="btn btn-primary" type="button">search</button>
-      </span>
-      <div class="input-group-addon" id="epsginfo">(4326) WGS 84</div>
-    </div>
+    
   </div>  
   
                  
@@ -71,6 +64,14 @@
        </ul>
      </div>
      </h5>
+     <div class="input-group" style="width: 100%;">
+      <span class="input-group-addon" id="search-label">EPSG</span>
+      <input id="epsg-query" type="text" class="form-control" placeholder="type the EPSG code" aria-describedby="search-label">
+      <span class="input-group-btn">
+            <button onclick="formatParseApp.searchEPSG()" class="btn btn-primary" type="button">search</button>
+      </span>
+      <div class="input-group-addon" id="epsginfo">(4326) WGS 84</div>
+    </div>
      </div>
      </div>
      </div>
