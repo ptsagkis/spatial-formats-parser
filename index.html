@@ -148,25 +148,21 @@ var formatParseApp = {
       switch (usrFormat) {
        case 'GeoJson':
           try {
-            
-            
             var geoJsonProj =  new ol.format.GeoJSON().readProjection(document.getElementById('format-input').value);
             console.log("geoJsonProj",geoJsonProj);
             if (typeof geoJsonProj !== 'undefined' && geoJsonProj !== null){
-            formatParseApp.defProj = geoJsonProj;
-            // document.getElementById('epsginfo').innerHTML = geoJsonProj.code_;
-            $('#epsg-query').val(geoJsonProj.code_.split(":")[1]);
-            this.searchEPSG();
+              formatParseApp.defProj = geoJsonProj;
+              $('#epsg-query').val(geoJsonProj.getCode().split(":")[1]);
+              this.searchEPSG();
             }
             console.log("formatParseApp.defProj2",formatParseApp.defProj)
             var projConfig = {};
             if (formatParseApp.defProj == 'EPSG:3857') {
-            console.log("proj config equals map projection")
-            projConfig = {};
+              projConfig = {};
             } else if (formatParseApp.defProj != 'EPSG:3857') {
-            projConfig = {
-            dataProjection: ol.proj.get(formatParseApp.defProj),
-            featureProjection: ol.proj.get('EPSG:3857')
+              projConfig = {
+              dataProjection: ol.proj.get(formatParseApp.defProj),
+              featureProjection: ol.proj.get('EPSG:3857')
             }
             }
             features = new ol.format.GeoJSON().readFeatures(
